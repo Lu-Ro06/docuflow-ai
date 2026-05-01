@@ -4,10 +4,12 @@ import ClusterStatus from './components/ClusterStatus';
 import DocumentCard from './components/DocumentCard';
 import FileUpload from './components/FileUpload';
 import Login from './components/Login';
-import { Search, Bell, LogOut } from 'lucide-react';
+import { Search, Bell, LogOut, X, User, Mail, Lock, Briefcase, Eye, EyeOff } from 'lucide-react';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('docuflow_current_user');
@@ -19,6 +21,8 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('docuflow_current_user');
     setUser(null);
+    setShowProfileModal(false);
+    setShowPassword(false);
   };
 
   const documents = [
@@ -33,8 +37,85 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen bg-docu-dark">
-      <Navbar user={user} />
+    <div className="flex min-h-screen bg-docu-dark relative">
+      <Navbar user={user} onProfileClick={() => setShowProfileModal(true)} />
+      
+      {/* Modal de Perfil */}
+      {showProfileModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300">
+          <div className="glass-panel p-6 rounded-3xl w-full max-w-sm border border-white/10 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-white">Mi Perfil</h2>
+              <button 
+                onClick={() => {
+                  setShowProfileModal(false);
+                  setShowPassword(false);
+                }}
+                className="text-gray-400 hover:text-white transition-colors p-1 bg-white/5 rounded-lg hover:bg-white/10"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1.5 ml-1">Nombre</label>
+                <div className="flex items-center gap-3 bg-black/20 border border-white/5 p-3 rounded-xl text-white text-sm">
+                  <User size={18} className="text-docu-accent" />
+                  <span>{user.name}</span>
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1.5 ml-1">Correo Electrónico</label>
+                <div className="flex items-center gap-3 bg-black/20 border border-white/5 p-3 rounded-xl text-white text-sm">
+                  <Mail size={18} className="text-docu-accent" />
+                  <span>{user.email}</span>
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1.5 ml-1">Contraseña</label>
+                <div className="flex items-center justify-between bg-black/20 border border-white/5 p-3 rounded-xl text-white text-sm">
+                  <div className="flex items-center gap-3">
+                    <Lock size={18} className="text-docu-accent" />
+                    <span className="font-mono tracking-widest text-lg leading-none pt-1">
+                      {showPassword ? (
+                        <span className="font-sans tracking-normal text-sm leading-normal">{user.password}</span>
+                      ) : (
+                        '•'.repeat(user.password?.length || 8)
+                      )}
+                    </span>
+                  </div>
+                  <button 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-gray-400 hover:text-docu-accent transition-colors"
+                    title={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1.5 ml-1">Rol</label>
+                <div className="flex items-center gap-3 bg-black/20 border border-white/5 p-3 rounded-xl text-white text-sm capitalize">
+                  <Briefcase size={18} className="text-docu-accent" />
+                  <span>{user.role}</span>
+                </div>
+              </div>
+            </div>
+
+            <button 
+              onClick={handleLogout}
+              className="w-full mt-6 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/30 font-medium py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+            >
+              <LogOut size={18} />
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
+      )}
       
       <main className="flex-1 overflow-y-auto">
         {/* Top Header */}
@@ -53,13 +134,7 @@ function App() {
               <Bell width={20} height={20} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-docu-accent rounded-full shadow-[0_0_8px_rgba(56,189,248,0.8)]"></span>
             </button>
-            <button 
-              onClick={handleLogout}
-              className="p-2 rounded-xl text-gray-400 hover:text-red-400 hover:bg-white/5 transition-colors"
-              title="Cerrar sesión"
-            >
-              <LogOut width={20} height={20} />
-            </button>
+            {/* Se elimina el botón de logout de arriba para dejar solo el del perfil modal */}
           </div>
         </header>
 

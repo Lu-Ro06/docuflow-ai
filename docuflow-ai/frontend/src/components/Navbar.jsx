@@ -1,7 +1,7 @@
 import React from 'react';
 import { LayoutDashboard, FileText, Settings, Database } from 'lucide-react';
 
-const Navbar = ({ user }) => {
+const Navbar = ({ user, onProfileClick }) => {
   const initials = user?.name ? user.name.substring(0, 2).toUpperCase() : 'US';
 
   return (
@@ -21,13 +21,16 @@ const Navbar = ({ user }) => {
         <NavItem icon={<Settings size={20} />} label="Configuración" />
       </div>
 
-      <div className="mt-auto px-2">
-        <div className="glass-panel p-4 rounded-xl flex items-center gap-3 hover:bg-white/5 transition-colors cursor-pointer">
-          <div className="w-8 h-8 rounded-full bg-docu-blue/20 flex items-center justify-center text-docu-accent font-semibold">
+      <div className="mt-auto px-2 relative">
+        <div 
+          onClick={onProfileClick}
+          className="glass-panel p-4 rounded-xl flex items-center gap-3 hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/10"
+        >
+          <div className="w-8 h-8 rounded-full bg-docu-blue/20 flex items-center justify-center text-docu-accent font-semibold shrink-0">
             {initials}
           </div>
           <div className="flex flex-col overflow-hidden">
-            <span className="text-sm font-medium truncate">{user?.name || 'Usuario'}</span>
+            <span className="text-sm font-medium text-white truncate">{user?.name || 'Usuario'}</span>
             <span className="text-xs text-gray-400 truncate capitalize">
               {user?.role ? `${user.role} • ` : ''}{user?.email || 'usuario@docuflow.ai'}
             </span>
