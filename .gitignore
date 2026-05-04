@@ -14,5 +14,5 @@ frontend/node_modules/
 *.swp
 
 # Build
-frontenddist/
+frontend/dist/
 build/
