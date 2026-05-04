@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Database, Lock, Mail, User, Briefcase } from 'lucide-react';
+import api from '../api/axios.js';
+
 
 const Login = ({ onLogin }) => {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -9,30 +11,51 @@ const Login = ({ onLogin }) => {
   const [role, setRole] = useState('secretaria');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Usamos localStorage como base de datos de prueba
-    const users = JSON.parse(localStorage.getItem('docuflow_users') || '[]');
-
-    if (isRegistering) {
-      if (users.find(u => u.email === email)) {
-        setError('El correo ya está registrado.');
-        return;
-      }
-      const newUser = { name, email, password, role };
-      users.push(newUser);
-      localStorage.setItem('docuflow_users', JSON.stringify(users));
-      localStorage.setItem('docuflow_current_user', JSON.stringify(newUser));
-      onLogin(newUser);
-    } else {
-      const user = users.find(u => u.email === email && u.password === password);
-      if (user) {
-        localStorage.setItem('docuflow_current_user', JSON.stringify(user));
-        onLogin(user);
+    try {
+      if (isRegistering) {
+        // Llamada al endpoint de registro
+        const response = await api.post('/auth/users/register', {
+          name,
+          email,
+          password,
+          role,
+        });
+        
+        // Después de registrar, hacemos login automático
+        const loginResponse = await api.post('/auth/users/login', {
+          email,
+          password,
+        });
+        
+        localStorage.setItem('auth_token', loginResponse.data.token);
+        const userData = { name, email, role };
+        onLogin(userData);
       } else {
-        setError('Correo o contraseña incorrectos.');
+        // Llamada al endpoint de login
+        const response = await api.post('/auth/users/login', {
+          email,
+          password,
+        });
+        
+        localStorage.setItem('auth_token', response.data.token);
+        const userData = { email };
+        onLogin(userData);
+      }
+    } catch (err) {
+      // Manejo de errores del backend
+      console.error('Error en login/registro:', err);
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.message) {
+        setError(`Error: ${err.message}`);
+      } else {
+        setError('Error de conexión. Por favor, intenta de nuevo.');
       }
     }
   };
@@ -52,7 +75,7 @@ const Login = ({ onLogin }) => {
             <Database className="text-white w-8 h-8" />
           </div>
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 mb-2">
-            DocuFlow AI
+            DocsFlow AI
           </h1>
           <p className="text-gray-400 text-sm text-center">
             {isRegistering ? 'Crea una cuenta nueva' : 'Ingresa a tu cuenta para continuar'}
