@@ -236,45 +236,54 @@ function App() {
             </div>
           </div>
 
-          <ClusterStatus />
+          {user.role !== 'secretaria' && user.role !== 'admin' && user.role !== 'administrativo' && <ClusterStatus />}
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <div className="flex items-center justify-between mb-4">
+          <div className="w-full">
+            <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-white">Documentos Recientes</h2>
                 <button className="text-sm text-docu-accent hover:text-blue-400 font-medium">Ver Todos</button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {documents.map(doc => (
-                  <DocumentCard key={doc.id} {...doc} />
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              {user.role === 'administrativo' ? (
-                <div className="glass-panel p-6 rounded-2xl mb-6 flex flex-col items-center justify-center text-center opacity-70">
-                  <Lock size={32} className="text-docu-blue mb-3" />
-                  <h3 className="text-sm font-medium text-white">Subida Restringida</h3>
-                  <p className="text-xs text-gray-400 mt-1">Los administradores no tienen permisos para subir nuevos documentos al sistema.</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Alta Prioridad */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-semibold text-red-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
+                    Alta Prioridad
+                  </h3>
+                  {documents.filter(d => d.status === 'red').map(doc => (
+                    <DocumentCard key={doc.id} {...doc} />
+                  ))}
+                  {documents.filter(d => d.status === 'red').length === 0 && (
+                    <div className="text-gray-500 text-xs italic bg-white/5 p-3 rounded-xl border border-white/5 text-center">Vacío</div>
+                  )}
                 </div>
-              ) : (
-                <FileUpload />
-              )}
-              
-              {/* Quick Stats */}
-              <div className="glass-panel p-6 rounded-2xl">
-                <h3 className="text-sm font-semibold text-gray-300 mb-4">Cola de Procesamiento</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-400">Tareas Activas</span>
-                    <span className="font-medium text-docu-accent">24</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-400">Tasa de Éxito</span>
-                    <span className="font-medium text-green-400">99.2%</span>
-                  </div>
+                
+                {/* Media Prioridad */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]"></div>
+                    Media Prioridad
+                  </h3>
+                  {documents.filter(d => d.status === 'amber').map(doc => (
+                    <DocumentCard key={doc.id} {...doc} />
+                  ))}
+                  {documents.filter(d => d.status === 'amber').length === 0 && (
+                    <div className="text-gray-500 text-xs italic bg-white/5 p-3 rounded-xl border border-white/5 text-center">Vacío</div>
+                  )}
                 </div>
+
+                {/* Baja Prioridad */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]"></div>
+                    Baja Prioridad
+                  </h3>
+                  {documents.filter(d => d.status === 'green').map(doc => (
+                    <DocumentCard key={doc.id} {...doc} />
+                  ))}
+                  {documents.filter(d => d.status === 'green').length === 0 && (
+                    <div className="text-gray-500 text-xs italic bg-white/5 p-3 rounded-xl border border-white/5 text-center">Vacío</div>
+                  )}
               </div>
             </div>
           </div>

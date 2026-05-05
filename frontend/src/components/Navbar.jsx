@@ -18,7 +18,6 @@ const Navbar = ({ user, onProfileClick }) => {
       <div className="flex-1 space-y-2">
         <NavItem icon={<LayoutDashboard size={20} />} label="Panel Principal" active />
         <NavItem icon={<FileText size={20} />} label="Documentos" />
-        <NavItem icon={<Settings size={20} />} label="Configuración" />
       </div>
 
       <div className="mt-auto px-2 relative">

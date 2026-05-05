@@ -16,44 +16,53 @@ const Login = ({ onLogin }) => {
     setError('');
 
     try {
+      // --- CÓDIGO SIMULADO CON LOCALSTORAGE ---
+      // (Para que puedas probar la interfaz sin tener el backend corriendo)
+      const users = JSON.parse(localStorage.getItem('docuflow_users') || '[]');
+
       if (isRegistering) {
-        // Llamada al endpoint de registro
-        const response = await api.post('/auth/users/register', {
-          name,
-          email,
-          password,
-          role,
-        });
+        // Verificar si ya existe
+        if (users.find(u => u.email === email)) {
+          setError('Este correo ya está registrado');
+          return;
+        }
         
-        // Después de registrar, hacemos login automático
-        const loginResponse = await api.post('/auth/users/login', {
-          email,
-          password,
-        });
-        
+        const newUser = { name, email, password, role };
+        users.push(newUser);
+        localStorage.setItem('docuflow_users', JSON.stringify(users));
+        localStorage.setItem('docuflow_current_user', JSON.stringify(newUser));
+        onLogin(newUser);
+
+        /* 
+        // --- CÓDIGO PARA CUANDO TENGAS TU BACKEND ---
+        const response = await api.post('/auth/users/register', { name, email, password, role });
+        const loginResponse = await api.post('/auth/users/login', { email, password });
         localStorage.setItem('auth_token', loginResponse.data.token);
-        const userData = { name, email, role };
-        onLogin(userData);
+        onLogin({ name, email, role });
+        */
       } else {
-        // Llamada al endpoint de login
-        const response = await api.post('/auth/users/login', {
-          email,
-          password,
-        });
-        
+        // Lógica de Login simulado
+        const user = users.find(u => u.email === email && u.password === password);
+        if (user) {
+          localStorage.setItem('docuflow_current_user', JSON.stringify(user));
+          onLogin(user);
+        } else {
+          setError('Correo o contraseña incorrectos');
+        }
+
+        /*
+        // --- CÓDIGO PARA CUANDO TENGAS TU BACKEND ---
+        const response = await api.post('/auth/users/login', { email, password });
         localStorage.setItem('auth_token', response.data.token);
-        const userData = { email };
-        onLogin(userData);
+        onLogin({ email }); // Idealmente el backend devolvería el nombre y rol también
+        */
       }
     } catch (err) {
-      // Manejo de errores del backend
       console.error('Error en login/registro:', err);
       if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else if (err.response?.data?.message) {
         setError(err.response.data.message);
-      } else if (err.message) {
-        setError(`Error: ${err.message}`);
       } else {
         setError('Error de conexión. Por favor, intenta de nuevo.');
       }
