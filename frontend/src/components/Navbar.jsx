@@ -1,7 +1,7 @@
 import React from 'react';
 import { LayoutDashboard, FileText, Settings, Database } from 'lucide-react';
 
-const Navbar = ({ user, onProfileClick }) => {
+const Navbar = ({ user, onProfileClick, activeTab, onTabChange }) => {
   const initials = user?.name ? user.name.substring(0, 2).toUpperCase() : 'US';
 
   return (
@@ -16,8 +16,18 @@ const Navbar = ({ user, onProfileClick }) => {
       </div>
 
       <div className="flex-1 space-y-2">
-        <NavItem icon={<LayoutDashboard size={20} />} label="Panel Principal" active />
-        <NavItem icon={<FileText size={20} />} label="Documentos" />
+        <NavItem 
+          icon={<LayoutDashboard size={20} />} 
+          label="Panel Principal" 
+          active={activeTab === 'dashboard'} 
+          onClick={() => onTabChange('dashboard')}
+        />
+        <NavItem 
+          icon={<FileText size={20} />} 
+          label="Documentos" 
+          active={activeTab === 'documents'}
+          onClick={() => onTabChange('documents')}
+        />
       </div>
 
       <div className="mt-auto px-2 relative">
@@ -40,8 +50,9 @@ const Navbar = ({ user, onProfileClick }) => {
   );
 };
 
-const NavItem = ({ icon, label, active }) => (
+const NavItem = ({ icon, label, active, onClick }) => (
   <button
+    onClick={onClick}
     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
       active 
         ? 'bg-docu-blue/20 text-docu-accent border border-docu-blue/30 shadow-inner' 

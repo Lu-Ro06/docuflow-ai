@@ -23,8 +23,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Limpiar sesión completa y recargar para volver al Login
       localStorage.removeItem('auth_token');
-      window.location.href = '/login';
+      localStorage.removeItem('docuflow_current_user');
+      window.location.reload();
     }
     return Promise.reject(error);
   }
